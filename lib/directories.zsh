@@ -35,7 +35,6 @@ alias po='popd'
 
 alias s='scripts/generate-project.sh'
 alias m='mint run yonaskolb/xcodegen'
-alias api='scripts/generate-api.sh http://stag.massiveaxis.com/api/spec'
 alias gpf='gp -f'
 alias ggpf='ggp -f'
 alias gbD='gb -D'
