@@ -256,3 +256,6 @@ alias gwip='git add -A; git rm $(git ls-files --deleted) 2> /dev/null; git commi
 api() {
     scripts/generate-api.sh http://$1.massiveaxis.com/api/spec
 }
+axis() {
+    cd ~/Desktop/axis-sdk-apple/
+}
