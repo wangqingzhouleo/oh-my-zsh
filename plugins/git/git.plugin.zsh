@@ -259,3 +259,11 @@ api() {
 axis() {
     cd ~/Desktop/axis-sdk-apple/
 }
+
+record() {
+	if [[ "$1" == "" ]]; then
+		echo File name not provided
+	else
+		xcrun simctl io booted recordVideo $1
+	fi
+}
