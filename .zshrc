@@ -106,4 +106,4 @@ fi
 unset color_prompt force_color_prompt
 
 source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
-source /Users/leo.wang/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
