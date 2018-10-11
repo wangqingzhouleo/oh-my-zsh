@@ -31,4 +31,4 @@ blue: 0079FF
 
 
 *Xcode settings:*
-mv Default.idekeybindings ~/Library/Developer/Xcode/UserData/KeyBindings
+mv Leo.idekeybindings ~/Library/Developer/Xcode/UserData/KeyBindings
