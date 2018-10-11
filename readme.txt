@@ -28,6 +28,7 @@ brew install zsh-syntax-highlighting
 
 Terminal theme:
 blue: 0079FF
+Cursor: E08200
 
 
 *Xcode settings:*
