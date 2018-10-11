@@ -1,13 +1,13 @@
 Move the WWDC.xccolortheme file into ~/Library/Developer/Xcode/UserData/FontAndColorThemes
 
-Installation:
+*Installation:*
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/wangqingzhouleo/oh-my-zsh/master/tools/install.sh)"
 remove .oh-my-zsh
 mv oh-my-zsh .oh-my-zsh
 copy .zshrc from .oh-my-zsh to ~
 
 
-Install fonts
+*Install fonts*
 # clone
 git clone https://github.com/powerline/fonts.git
 # install
@@ -21,10 +21,14 @@ rm -rf fonts
 git clone https://github.com/bhilburn/powerlevel9k.git ~/.oh-my-zsh/custom/themes/powerlevel9k
 
 
-Install tools:
+*Install tools:*
 git clone https://github.com/zsh-users/zsh-autosuggestions ~/.zsh/zsh-autosuggestions
 brew install zsh-syntax-highlighting
 
 
 Terminal theme:
 blue: 0079FF
+
+
+*Xcode settings:*
+mv Default.idekeybindings ~/Library/Developer/Xcode/UserData/KeyBindings
