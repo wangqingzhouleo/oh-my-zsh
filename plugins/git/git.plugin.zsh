@@ -38,6 +38,7 @@ function work_in_progress() {
 # (sorted alphabetically)
 #
 
+alias py3='python3'
 alias g='git'
 
 alias ga='git add'
