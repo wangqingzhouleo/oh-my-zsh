@@ -270,3 +270,16 @@ record() {
 		xcrun simctl io booted recordVideo $1
 	fi
 }
+
+json() {
+    FILE_NAME=output.json
+    if [[ "$1" == "" ]]; then
+        pbpaste > $FILE_NAME
+    else
+        echo $1 > $FILE_NAME
+    fi
+
+    prettier --write $FILE_NAME
+    open -W $FILE_NAME
+    rm -rf $FILE_NAME
+}
