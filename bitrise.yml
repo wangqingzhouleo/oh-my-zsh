@@ -1,0 +1,433 @@
+---
+format_version: '4'
+default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
+project_type: ios
+trigger_map:
+- push_branch: "*"
+  workflow: ad-hoc-ios
+- tag: "*"
+  workflow: app-store-ios
+workflows:
+  app-store-ios:
+    before_run:
+    - _setup
+    steps:
+    - ios-auto-provision:
+        inputs:
+        - generate_profiles: 'yes'
+        - distribution_type: app-store
+        - team_id: "$MASSIVE_TEAM"
+    - certificate-and-profile-installer: {}
+    - xcode-archive:
+        inputs:
+        - compile_bitcode: 'no'
+        - team_id: "$MASSIVE_TEAM"
+        - export_method: app-store
+    - deploy-to-bitrise-io:
+        inputs:
+        - notify_user_groups: none
+    - deploy-to-itunesconnect-deliver:
+        inputs:
+        - password: "$ITUNES_PASSWORD"
+        - team_name: "$ITUNES_CONNECT_TEAM_NAME"
+        - bundle_id: "$APP_STORE_BUNDLE_ID"
+        - itunescon_user: "$ITUNES_EMAIL"
+    - slack@2.7.4:
+        inputs:
+        - channel: axis-native-releases
+        - timestamp: 'no'
+        - footer_icon: ''
+        - footer: ''
+        - message: ''
+        - pretext: "*Axis iOS $XPI_VERSION released to Test Flight!*"
+        - author_name: ''
+        - title: ''
+        - pretext_on_error: "*Axis iOS $XPI_VERSION release failed*"
+        - message_on_error: ''
+        - fields: ''
+        - buttons: |
+            View App|${BITRISE_APP_URL}
+            View Build|${BITRISE_BUILD_URL}
+        - webhook_url: https://hooks.slack.com/services/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
+    description: Deploys to the App store and Test Flight
+    after_run:
+    - _complete
+    envs:
+    - BITRISE_SCHEME: Axis_iOS Demo
+  _setup:
+    steps:
+    - activate-ssh-key@3.1.1:
+        run_if: '{{getenv "SSH_RSA_PRIVATE_KEY" | ne ""}}'
+    - git-clone@4.0.11: {}
+    - script@1.1.5:
+        inputs:
+        - content: |-
+            #!/usr/bin/env bash
+
+            curl https://$STASH_DOMAIN/rest/build-status/1.0/commits/$GIT_CLONE_COMMIT_HASH \
+              -u $STASH_USER:$STASH_PASSWORD \
+              -H 'Content-Type: application/json' \
+              --data-binary \
+              $'{
+                "state": "INPROGRESS",
+                "key": "'$BITRISE_APP_TITLE'",
+                "name": "Bitrise '$BITRISE_APP_TITLE' #'$BITRISE_BUILD_NUMBER'",
+                "url": "'$BITRISE_BUILD_URL'",
+                "description": "'$BITRISE_TRIGGERED_WORKFLOW_ID' workflow"
+               }' \
+               --compressed
+        title: Report build status
+    - cache-pull@2.0.1:
+        inputs:
+        - workdir: |-
+            $BITRISE_SOURCE_DIR
+            $MINT_DIRECTORY
+    - script@1.1.5:
+        inputs:
+        - content: |-
+            #!/usr/bin/env bash
+
+            # debug log
+            set -x
+
+            # install all tools
+            sh scripts/install-tools.sh
+        title: Install tools
+    - carthage:
+        inputs:
+        - carthage_options: "--platform iOS --cache-builds --new-resolver"
+    - script@1.1.5:
+        title: Generate Project
+        inputs:
+        - content: |-
+            #!/usr/bin/env bash
+            # fail if any commands fails
+            set -e
+
+            sh scripts/generate-project.sh
+    - set-xcode-build-number:
+        inputs:
+        - plist_path: "$INFO_PLIST_PATH"
+    - xcode-project-info@2.0.0:
+        inputs:
+        - info_plist_path: "$INFO_PLIST_PATH"
+    - cache-push@2.0.5:
+        is_always_run: true
+        inputs:
+        - cache_paths: |
+            $BITRISE_CACHE_DIR
+            $MINT_DIRECTORY
+  _complete:
+    steps:
+    - cache-push@2.0.5:
+        is_always_run: true
+        inputs:
+        - cache_paths: |
+            $BITRISE_CACHE_DIR
+            $MINT_DIRECTORY
+    - script@1.1.5:
+        is_always_run: true
+        inputs:
+        - content: |-
+            #!/usr/bin/env bash
+
+            if [ $BITRISE_BUILD_STATUS == "0" ]; then
+              BUILD_STATE="SUCCESSFUL"
+            else
+              BUILD_STATE="FAILED"
+            fi
+
+            curl https://$STASH_DOMAIN/rest/build-status/1.0/commits/$GIT_CLONE_COMMIT_HASH \
+              -u $STASH_USER:$STASH_PASSWORD \
+              -H 'Content-Type: application/json' \
+              --data-binary \
+              $'{
+                "state": "'$BUILD_STATE'",
+                "key": "'$BITRISE_APP_TITLE'",
+                "name": "Bitrise '$BITRISE_APP_TITLE' #'$BITRISE_BUILD_NUMBER'",
+                "url": "'$BITRISE_BUILD_URL'",
+                "description": "'$BITRISE_TRIGGERED_WORKFLOW_ID' workflow"
+               }' \
+               --compressed
+        title: Report Build Status
+    - script@1.1.5:
+        is_always_run: true
+        inputs:
+        - content: |-
+            #!/usr/bin/env bash
+
+            brew install jq
+
+            echo Matching pull request for commit $GIT_CLONE_COMMIT_HASH
+            STASH_PULL_REQUEST_ID=$(curl -s -X GET https://stash.massiveinteractive.com/rest/api/1.0/projects/MUI/repos/axis-sdk-apple/pull-requests \
+                -u $STASH_USER:$STASH_PASSWORD \
+                | jq --arg COMMIT "$GIT_CLONE_COMMIT_HASH" '.values[] | select(.fromRef.latestCommit == $COMMIT) | .id')
+
+            if [ -z "$STASH_PULL_REQUEST_ID" ]; then
+                echo No pull request found for this commit
+                exit 0
+            fi
+
+            echo Pull request \#$STASH_PULL_REQUEST_ID was found
+            echo Retriving linked JIRA issues
+
+            JIRA_ISSUES=$(curl -s -X GET https://stash.massiveinteractive.com/rest/jira/1.0/projects/MUI/repos/axis-sdk-apple/pull-requests/$STASH_PULL_REQUEST_ID/issues \
+              -u $STASH_USER:$STASH_PASSWORD | jq '.[]')
+
+            if [ -z "$JIRA_ISSUES" ]; then
+                echo No linked JIRA issue
+                exit 0
+            fi
+
+            ISSUE_KEYS=$(echo $JIRA_ISSUES | jq -r '.key')
+
+            COMMENT_PREFIX="(Auto Updated) Bitrise $BITRISE_APP_TITLE build"
+
+            if [ $BITRISE_BUILD_STATUS == "0" ]; then
+              BUILD_STATE="successful (/)"
+            else
+              BUILD_STATE="failed (x)"
+            fi
+
+            update_comment()
+            {
+                if [ "$1" == "add" ]; then
+                    TARGET_URL=https://agile.massiveinteractive.com/rest/api/2/issue/$2/comment
+                    METHOD=POST
+                elif [ "$1" == "delete" ]; then
+                    TARGET_URL=https://agile.massiveinteractive.com/rest/api/2/issue/$2/comment/$3
+                    METHOD=DELETE
+                else
+                    exit
+                fi
+
+                curl -s -X $METHOD $TARGET_URL \
+                    -u $STASH_USER:$STASH_PASSWORD \
+                    -o /dev/null \
+                    -H 'Content-Type: application/json' \
+                    -d @message.json
+            }
+
+            for KEY in $ISSUE_KEYS
+            do
+                echo
+                echo Updating comment for issue $KEY
+                COMMENT_ID=$(curl -s -X GET https://agile.massiveinteractive.com/rest/api/2/issue/$KEY/comment \
+                    -u $STASH_USER:$STASH_PASSWORD \
+                    | jq -r --arg STASH_USER "$STASH_USER" --arg COMMENT "$COMMENT_PREFIX" \
+                    '.comments[] | select(.author.key == $STASH_USER) | select(.body | contains($COMMENT)) | .id')
+
+                echo \{\"body\": \"$COMMENT_PREFIX \[\#$BITRISE_BUILD_NUMBER\|$BITRISE_BUILD_URL\] $BUILD_STATE\"\} > message.json
+
+                if [ -z "$COMMENT_ID" ]; then
+                    echo Comment not found. Adding a new comment
+                    update_comment add $KEY
+                else
+                    echo Comment exists. Deleting existing comment and adding a new one to keep it at bottom
+                    update_comment delete $KEY $COMMENT_ID
+                    update_comment add $KEY
+                fi
+            done
+            rm message.json
+        title: Update comment on JIRA issue
+    description: Runs steps that happen after everything else
+  app-store-tvos:
+    before_run:
+    - _setup
+    steps:
+    - set-xcode-build-number@1.0.5:
+        inputs:
+        - plist_path: Axis_tvOS_topshelf/Info.plist
+    - ios-auto-provision@1.1.3:
+        inputs:
+        - team_id: "$MASSIVE_TEAM"
+        - generate_profiles: 'yes'
+        - distribution_type: app-store
+    - certificate-and-profile-installer@1.9.3: {}
+    - xcode-archive@2.4.8:
+        inputs:
+        - compile_bitcode: 'no'
+        - team_id: "$MASSIVE_TEAM"
+        - export_method: app-store
+    - deploy-to-bitrise-io@1.3.11:
+        inputs:
+        - notify_user_groups: none
+    - deploy-to-itunesconnect-deliver@2.13.2:
+        inputs:
+        - password: "$ITUNES_PASSWORD"
+        - team_name: "$ITUNES_CONNECT_TEAM_NAME"
+        - bundle_id: "$APP_STORE_BUNDLE_ID"
+        - platform: appletvos
+        - itunescon_user: "$ITUNES_EMAIL"
+    - slack@2.7.2:
+        inputs:
+        - channel: axis-native-releases
+        - timestamp: 'no'
+        - footer_icon: ''
+        - footer: ''
+        - message: ''
+        - pretext: "*Axis tvOS $XPI_VERSION released to Test Flight!*"
+        - author_name: ''
+        - title: ''
+        - pretext_on_error: "*Axis tvOS $XPI_VERSION release failed*"
+        - message_on_error: ''
+        - fields: |
+            App|tvOS
+            Branch|${BITRISE_GIT_BRANCH}
+            Workflow|${BITRISE_TRIGGERED_WORKFLOW_ID}
+        - webhook_url: https://hooks.slack.com/services/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
+    description: Deploys to the App store and Test Flight
+    after_run:
+    - _complete
+    envs:
+    - BITRISE_SCHEME: Axis_tvOS Demo
+    - INFO_PLIST_PATH: Axis_tvOS/Assets/Info.plist
+  ad-hoc-ios:
+    before_run:
+    - _setup
+    steps:
+    - ios-auto-provision:
+        inputs:
+        - distribution_type: ad-hoc
+        - generate_profiles: 'yes'
+        - team_id: "$MASSIVE_TEAM"
+    - certificate-and-profile-installer: {}
+    - xcode-archive:
+        inputs:
+        - upload_bitcode: 'no'
+        - compile_bitcode: 'no'
+        - team_id: "$MASSIVE_TEAM"
+        - export_method: ad-hoc
+    - deploy-to-bitrise-io:
+        inputs:
+        - notify_user_groups: none
+    - slack@2.7.4:
+        inputs:
+        - channel: axis-ios-builds
+        - timestamp: 'no'
+        - footer_icon: ''
+        - footer: ''
+        - message: ''
+        - pretext: "*Axis iOS $XPI_VERSION build succeeded!*"
+        - author_name: ''
+        - title: ''
+        - pretext_on_error: "*Axis iOS $XPI_VERSION build failed*"
+        - message_on_error: ''
+        - fields: |
+            App|${BITRISE_APP_TITLE}
+            Branch|${BITRISE_GIT_BRANCH}
+            Workflow|${BITRISE_TRIGGERED_WORKFLOW_ID}
+            Build|${BITRISE_BUILD_NUMBER}
+        - buttons: |-
+            View App|${BITRISE_APP_URL}
+            View Build|${BITRISE_BUILD_URL}
+            Install Page|${BITRISE_PUBLIC_INSTALL_PAGE_URL}
+        - webhook_url: https://hooks.slack.com/services/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
+    description: Builds and deploys to Bitrise
+    after_run:
+    - _complete
+  ad-hoc-tvos:
+    before_run:
+    - _setup
+    steps:
+    - ios-auto-provision@1.1.3:
+        inputs:
+        - distribution_type: ad-hoc
+        - configuration: ''
+        - generate_profiles: 'yes'
+        - team_id: "$MASSIVE_TEAM"
+    - certificate-and-profile-installer@1.9.3: {}
+    - xcode-archive@2.4.8:
+        inputs:
+        - compile_bitcode: 'no'
+        - team_id: "$MASSIVE_TEAM"
+        - export_method: ad-hoc
+    - deploy-to-bitrise-io@1.3.11:
+        inputs:
+        - notify_user_groups: none
+    - slack@2.7.2:
+        inputs:
+        - channel: axis-ios-builds
+        - timestamp: 'no'
+        - footer_icon: ''
+        - footer: ''
+        - message: ''
+        - pretext: "*Axis tvOS $XPI_VERSION build succeeded!*"
+        - author_name: ''
+        - title: ''
+        - pretext_on_error: "*Axis tvOS $XPI_VERSION build failed*"
+        - message_on_error: ''
+        - webhook_url: https://hooks.slack.com/services/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
+        - fields: |
+            App|tvOS
+            Branch|${BITRISE_GIT_BRANCH}
+            Workflow|${BITRISE_TRIGGERED_WORKFLOW_ID}
+    description: Deploys to the App store and Test Flight
+    after_run:
+    - _complete
+    envs:
+    - BITRISE_SCHEME: Axis_tvOS Demo
+    - INFO_PLIST_PATH: Axis_tvOS/Assets/Info.plist
+  unit-test:
+    before_run:
+    - _setup
+    steps:
+    - ios-auto-provision:
+        inputs:
+        - generate_profiles: 'yes'
+        - distribution_type: ad-hoc
+        - team_id: "$MASSIVE_TEAM"
+    - certificate-and-profile-installer: {}
+    - xcode-archive:
+        inputs:
+        - upload_bitcode: 'no'
+        - compile_bitcode: 'no'
+        - team_id: "$MASSIVE_TEAM"
+        - xcodebuild_options: "-allowProvisioningUpdates"
+        - export_method: ad-hoc
+    - xcode-build-for-test@0.2.0:
+        inputs:
+        - xcodebuild_options: "-UseModernBuildSystem=NO"
+    - virtual-device-testing-for-ios@0.9.3: {}
+    - deploy-to-bitrise-io:
+        inputs:
+        - notify_user_groups: none
+    - slack@2.7.4:
+        inputs:
+        - channel: axis-ios-builds
+        - timestamp: 'no'
+        - footer_icon: ''
+        - footer: ''
+        - message: ''
+        - pretext: "*Axis iOS $XPI_VERSION build succeeded!*"
+        - author_name: ''
+        - title: ''
+        - pretext_on_error: "*Axis iOS $XPI_VERSION build failed*"
+        - message_on_error: ''
+        - fields: |
+            App|${BITRISE_APP_TITLE}
+            Branch|${BITRISE_GIT_BRANCH}
+            Workflow|${BITRISE_TRIGGERED_WORKFLOW_ID}
+            Build|${BITRISE_BUILD_NUMBER}
+        - buttons: |-
+            View App|${BITRISE_APP_URL}
+            View Build|${BITRISE_BUILD_URL}
+            Install Page|${BITRISE_PUBLIC_INSTALL_PAGE_URL}
+        - webhook_url: https://hooks.slack.com/services/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
+    description: Builds and deploys to Bitrise
+    after_run:
+    - _complete
+    envs:
+    - ADDON_VDTESTING_API_TOKEN: ''
+app:
+  envs:
+  - BITRISE_PROJECT_PATH: Axis.xcodeproj
+  - BITRISE_SCHEME: Axis_iOS QA2
+  - BITRISE_EXPORT_METHOD: app-store
+  - MINT_DIRECTORY: "/usr/local/lib/mint"
+  - MASSIVE_TEAM: 3PU2FX2MA5
+  - ENTERPRISE_TEAM: 3ABLN8ETNM
+  - ITUNES_CONNECT_TEAM_NAME: Massive Interactive Pty Ltd
+  - INFO_PLIST_PATH: Axis_iOS/Assets/Info.plist
+  - APP_STORE_BUNDLE_ID: co.massive.axis.demo
+  - STASH_DOMAIN: stash.massiveinteractive.com
