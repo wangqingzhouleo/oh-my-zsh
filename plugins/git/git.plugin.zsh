@@ -219,7 +219,7 @@ alias grbd='git rebase develop'
 alias grbs='git rebase --skip'
 alias grh='git reset HEAD'
 alias grhh='git reset HEAD --hard'
-alias grhh^='git reset --hard HEAD^'
+alias grhh1='git reset --hard HEAD~1'
 alias grmv='git remote rename'
 alias grrm='git remote remove'
 alias grset='git remote set-url'
@@ -256,6 +256,9 @@ alias glum='git pull upstream master'
 alias gwch='git whatchanged -p --abbrev-commit --pretty=medium'
 alias gwip='git add -A; git rm $(git ls-files --deleted) 2> /dev/null; git commit --no-verify -m "--wip-- [skip ci]"'
 
+alias sp='swift package'
+alias spr='swift package resolve'
+
 api() {
     scripts/generate-api.sh http://$1.massiveaxis.com/api/spec
 }
@@ -272,7 +275,7 @@ record() {
 }
 
 json() {
-    FILE_NAME=output.json
+    FILE_NAME=~/output.json
     if [[ "$1" == "" ]]; then
         pbpaste > $FILE_NAME
     else
