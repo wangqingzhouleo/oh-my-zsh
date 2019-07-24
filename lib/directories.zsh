@@ -42,3 +42,18 @@ alias glr='gup'
 alias grbm='grb master'
 alias gstau='git stash save -u'
 alias rmrf='rm -rf'
+
+dockerrun() {
+    if [[ "$1" == "" ]]; then
+	  echo "Requires Docker IMAGE"
+	else
+	    if [[ "$2" == "" ]]; then
+			DIR=`pwd`
+		else
+			DIR=$2
+		fi
+		IMAGE=$1
+
+		docker run -it --volume=$DIR:$DIR --workdir=$DIR --memory=4g --memory-swap=4g --memory-swappiness=0 --entrypoint=/bin/bash $IMAGE
+	fi
+}
