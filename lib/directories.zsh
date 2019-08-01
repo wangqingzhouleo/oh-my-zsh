@@ -35,12 +35,6 @@ alias po='popd'
 
 alias s='scripts/generate-project.sh'
 alias m='mint run yonaskolb/xcodegen'
-alias gpf='gp -f'
-alias ggpf='ggp -f'
-alias gbD='gb -D'
-alias glr='gup'
-alias grbm='grb master'
-alias gstau='git stash save -u'
 alias rmrf='rm -rf'
 
 dockerrun() {

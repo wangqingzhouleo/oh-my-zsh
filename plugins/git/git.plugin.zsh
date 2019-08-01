@@ -256,8 +256,17 @@ alias glum='git pull upstream master'
 alias gwch='git whatchanged -p --abbrev-commit --pretty=medium'
 alias gwip='git add -A; git rm $(git ls-files --deleted) 2> /dev/null; git commit --no-verify -m "--wip-- [skip ci]"'
 
+# Custom shortcuts
+
 alias sp='swift package'
 alias spr='swift package resolve'
+
+alias gpf='gp -f'
+alias ggpf='ggp -f'
+alias gbD='gb -D'
+alias glr='gup'
+alias grbm='grb master'
+alias gstau='git stash save -u'
 
 api() {
     scripts/generate-api.sh http://$1.massiveaxis.com/api/spec
