@@ -15,6 +15,7 @@ ZSH_THEME="powerlevel9k/powerlevel9k"
 POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(time dir vcs)
 POWERLEVEL9K_SHORTEN_DIR_LENGTH=1
 POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status nvm battery)
+#POWERLEVEL9K_PROMPT_ON_NEWLINE=true
 #POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX=''
 #POWERLEVEL9K_MULTILINE_SECOND_PROMPT_PREFIX="%K{white}%F{black} \UE12E `date +%T` %f%k%F{white}%f "
 
@@ -60,7 +61,7 @@ POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status nvm battery)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git bundler sublime osx rake ruby npm)
+plugins=(git bundler sublime osx rake ruby npm swiftpm vscode)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -105,5 +106,18 @@ else
 fi
 unset color_prompt force_color_prompt
 
-source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+#source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
+
+# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
+export GOPATH=$HOME/go
+export PATH="$PATH:$HOME/.rvm/bin:$HOME/Developer/sonar-scanner/bin:$GOPATH/bin"
+
+# tabtab source for serverless package
+# uninstall by removing these lines or running `tabtab uninstall serverless`
+[[ -f /Users/leo.wang/Developer/mTribes/web/node_modules/tabtab/.completions/serverless.zsh ]] && . /Users/leo.wang/Developer/mTribes/web/node_modules/tabtab/.completions/serverless.zsh
+# tabtab source for sls package
+# uninstall by removing these lines or running `tabtab uninstall sls`
+[[ -f /Users/leo.wang/Developer/mTribes/web/node_modules/tabtab/.completions/sls.zsh ]] && . /Users/leo.wang/Developer/mTribes/web/node_modules/tabtab/.completions/sls.zsh
