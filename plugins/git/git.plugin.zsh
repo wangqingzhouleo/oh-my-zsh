@@ -267,6 +267,7 @@ alias gbD='gb -D'
 alias glr='gup'
 alias grbm='grb master'
 alias gstau='git stash save -u'
+alias gen='xcodegen'
 
 api() {
     scripts/generate-api.sh http://$1.massiveaxis.com/api/spec
