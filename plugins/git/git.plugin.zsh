@@ -268,6 +268,7 @@ alias glr='gup'
 alias grbm='grb master'
 alias gstau='git stash save -u'
 alias gen='xcodegen'
+alias regen='gen & pod install'
 
 api() {
     scripts/generate-api.sh http://$1.massiveaxis.com/api/spec
@@ -295,4 +296,13 @@ json() {
     prettier --write $FILE_NAME
     open -W $FILE_NAME
     rm -rf $FILE_NAME
+}
+
+gtagf() {
+     if [[ "$1" == "" ]]; then
+         echo Must provide verion number
+     else
+         git tag -d $1
+         git tag $1
+     fi
 }
