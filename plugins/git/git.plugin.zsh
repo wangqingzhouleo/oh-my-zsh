@@ -268,7 +268,7 @@ alias glr='gup'
 alias grbm='grb master'
 alias gstau='git stash save -u'
 alias gen='xcodegen'
-alias regen='gen & pod install'
+alias regen='gen && pod install'
 
 api() {
     scripts/generate-api.sh http://$1.massiveaxis.com/api/spec
