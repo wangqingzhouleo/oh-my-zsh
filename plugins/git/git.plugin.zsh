@@ -270,6 +270,10 @@ alias gstau='git stash save -u'
 alias gen='xcodegen'
 alias regen='gen && pod install'
 
+alias gt='git tag'
+alias gtd='git tag -d'
+alias gtda='git tag | xargs git tag -d'
+
 api() {
     scripts/generate-api.sh http://$1.massiveaxis.com/api/spec
 }
