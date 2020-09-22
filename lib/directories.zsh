@@ -51,3 +51,18 @@ dockerrun() {
 		docker run -it --volume=$DIR:$DIR --workdir=$DIR --memory=4g --memory-swap=4g --memory-swappiness=0 --entrypoint=/bin/bash $IMAGE
 	fi
 }
+
+xc() {
+	PROJ=$(ls -d *.xcworkspace 2>/dev/null)
+
+	if [ $? -ne 0 ]; then
+	    PROJ=$(ls -d *.xcodeproj 2>/dev/null)
+	fi
+
+	if [[ "$PROJ" == "" ]]; then
+	 echo "No xcworkspace or xcodeproj found"
+	else
+	 echo "Opening $PROJ"
+	 open $PROJ
+	fi
+}
