@@ -61,7 +61,7 @@ POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status nvm battery)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git bundler sublime osx rake ruby npm swiftpm vscode zsh-autosuggestions)
+plugins=(git bundler sublime osx rake ruby npm swiftpm vscode zsh-autosuggestions vscode)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -112,8 +112,8 @@ source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 #export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
 
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
-export GOPATH=$HOME/go
-export PATH="$PATH:$HOME/.rvm/bin:$HOME/Developer/sonar-scanner/bin:$GOPATH/bin"
+#export GOPATH=$HOME/go
+#export PATH="$PATH:$HOME/.rvm/bin:$HOME/Developer/sonar-scanner/bin:$GOPATH/bin"
 
 # tabtab source for serverless package
 # uninstall by removing these lines or running `tabtab uninstall serverless`
