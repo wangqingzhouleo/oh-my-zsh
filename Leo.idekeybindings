@@ -96,7 +96,7 @@
 				<key>GroupedAlternate</key>
 				<string>NO</string>
 				<key>Keyboard Shortcut</key>
-				<string>@w</string>
+				<string>^~@e</string>
 				<key>Navigation</key>
 				<string>NO</string>
 				<key>Title</key>
@@ -116,7 +116,7 @@
 				<key>GroupedAlternate</key>
 				<string>NO</string>
 				<key>Keyboard Shortcut</key>
-				<string>$@W</string>
+				<string>^~$@E</string>
 				<key>Navigation</key>
 				<string>NO</string>
 				<key>Title</key>
@@ -124,31 +124,11 @@
 			</dict>
 			<dict>
 				<key>Action</key>
-				<string>closeOtherTabs:</string>
+				<string>closeOtherWindowTabs:</string>
 				<key>Alternate</key>
 				<string>YES</string>
 				<key>CommandID</key>
-				<string>Xcode.IDEKit.CmdDefinition.CloseOtherTabs</string>
-				<key>Group</key>
-				<string>File Menu</string>
-				<key>GroupID</key>
-				<string>Xcode.IDEKit.MenuDefinition.Main</string>
-				<key>GroupedAlternate</key>
-				<string>NO</string>
-				<key>Keyboard Shortcut</key>
-				<string>^~@w</string>
-				<key>Navigation</key>
-				<string>NO</string>
-				<key>Title</key>
-				<string>Close Other Tabs</string>
-			</dict>
-			<dict>
-				<key>Action</key>
-				<string>closeOtherWindows:</string>
-				<key>Alternate</key>
-				<string>YES</string>
-				<key>CommandID</key>
-				<string>Xcode.IDEKit.CmdDefinition.CloseOtherWindows</string>
+				<string>Xcode.IDEKit.CmdDefinition.CloseOtherWindowTabs</string>
 				<key>Group</key>
 				<string>File Menu</string>
 				<key>GroupID</key>
@@ -160,47 +140,27 @@
 				<key>Navigation</key>
 				<string>NO</string>
 				<key>Title</key>
-				<string>Close Other Windows</string>
+				<string>Close Other Window Tabs</string>
 			</dict>
 			<dict>
 				<key>Action</key>
-				<string>closeWindowAsTab:</string>
+				<string>dvt_closeWindowAsWindowTab:</string>
 				<key>Alternate</key>
 				<string>NO</string>
 				<key>CommandID</key>
-				<string>Xcode.IDEKit.CmdDefinition.CloseTab</string>
+				<string>Xcode.IDEKit.CmdDefinition.CloseWindowTab</string>
 				<key>Group</key>
 				<string>File Menu</string>
 				<key>GroupID</key>
 				<string>Xcode.IDEKit.MenuDefinition.Main</string>
 				<key>GroupedAlternate</key>
-				<string>YES</string>
+				<string>NO</string>
 				<key>Keyboard Shortcut</key>
 				<string>^$@W</string>
 				<key>Navigation</key>
 				<string>NO</string>
 				<key>Title</key>
-				<string>Close Tab</string>
-			</dict>
-			<dict>
-				<key>Action</key>
-				<string>dvt_performCloseWindow:</string>
-				<key>Alternate</key>
-				<string>NO</string>
-				<key>CommandID</key>
-				<string>Xcode.IDEKit.CmdDefinition.CloseWindow</string>
-				<key>Group</key>
-				<string>File Menu</string>
-				<key>GroupID</key>
-				<string>Xcode.IDEKit.MenuDefinition.Main</string>
-				<key>GroupedAlternate</key>
-				<string>NO</string>
-				<key>Keyboard Shortcut</key>
-				<string>^@w</string>
-				<key>Navigation</key>
-				<string>NO</string>
-				<key>Title</key>
-				<string>Close Window</string>
+				<string>Close Window Tab</string>
 			</dict>
 			<dict>
 				<key>Action</key>
@@ -541,42 +501,6 @@
 				<string>NO</string>
 				<key>Title</key>
 				<string>Reveal in Debug Navigator</string>
-			</dict>
-			<dict>
-				<key>Action</key>
-				<string>selectNextTab:</string>
-				<key>Alternate</key>
-				<string>NO</string>
-				<key>CommandID</key>
-				<string>Xcode.IDEKit.CmdDefinition.ShowNextTab</string>
-				<key>Group</key>
-				<string>Window Menu</string>
-				<key>GroupID</key>
-				<string>Xcode.IDEKit.MenuDefinition.Main</string>
-				<key>GroupedAlternate</key>
-				<string>NO</string>
-				<key>Navigation</key>
-				<string>NO</string>
-				<key>Title</key>
-				<string>Show Next Tab</string>
-			</dict>
-			<dict>
-				<key>Action</key>
-				<string>selectPreviousTab:</string>
-				<key>Alternate</key>
-				<string>NO</string>
-				<key>CommandID</key>
-				<string>Xcode.IDEKit.CmdDefinition.ShowPreviousTab</string>
-				<key>Group</key>
-				<string>Window Menu</string>
-				<key>GroupID</key>
-				<string>Xcode.IDEKit.MenuDefinition.Main</string>
-				<key>GroupedAlternate</key>
-				<string>NO</string>
-				<key>Navigation</key>
-				<string>NO</string>
-				<key>Title</key>
-				<string>Show Previous Tab</string>
 			</dict>
 			<dict>
 				<key>Action</key>
