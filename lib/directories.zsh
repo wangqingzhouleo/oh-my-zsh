@@ -53,10 +53,14 @@ dockerrun() {
 }
 
 xc() {
-	PROJ=$(ls -d *.xcworkspace 2>/dev/null)
+    PRE=""
+    if [ $# -ne 0 ]; then
+        PRE="$1/"
+    fi
+	PROJ=$(ls -d $PRE*.xcworkspace 2>/dev/null)
 
 	if [ $? -ne 0 ]; then
-	    PROJ=$(ls -d *.xcodeproj 2>/dev/null)
+	    PROJ=$(ls -d $PRE*.xcodeproj 2>/dev/null)
 	fi
 
 	if [[ "$PROJ" == "" ]]; then
