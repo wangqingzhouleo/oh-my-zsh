@@ -70,3 +70,8 @@ xc() {
 	 open $PROJ
 	fi
 }
+
+alias and='open -a Android\ Studio .'
+alias andp='open -a Android\ Studio\ Preview .'
+alias lg='lazygit'
+alias gu='gitup'
