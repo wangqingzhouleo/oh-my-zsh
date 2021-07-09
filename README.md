@@ -1,34 +1,42 @@
-Move the WWDC.xccolortheme file into ~/Library/Developer/Xcode/UserData/FontAndColorThemes
+## Installation:
 
-*Installation:*
+```
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/wangqingzhouleo/oh-my-zsh/master/tools/install.sh)"
 remove .oh-my-zsh
 mv oh-my-zsh .oh-my-zsh
 copy .zshrc from .oh-my-zsh to ~
+```
 
+## Install fonts
 
-*Install fonts*
-# clone
+```
 git clone https://github.com/powerline/fonts.git
-# install
 cd fonts
 ./install.sh
-# clean-up a bit
 cd ..
 rm -rf fonts
+```
 
-# install theme
+## Install theme
+
+```
 git clone https://github.com/bhilburn/powerlevel9k.git ~/.oh-my-zsh/custom/themes/powerlevel9k
+```
 
+## Install zsh tools
 
-*Install tools:*
-git clone https://github.com/zsh-users/zsh-autosuggestions ~/.zsh/zsh-autosuggestions
+```
+git clone https://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/zsh-autosuggestions
 brew install zsh-syntax-highlighting
+```
 
+## Terminal theme
 
-Terminal theme:
 Import from Pro.terminal
 
+## Xcode settings
 
-*Xcode settings:*
-mv Leo.idekeybindings ~/Library/Developer/Xcode/UserData/KeyBindings
+```
+cp Leo.idekeybindings ~/Library/Developer/Xcode/UserData/KeyBindings
+cp WWDC.xccolortheme ~/Library/Developer/Xcode/UserData/FontAndColorThemes
+```
